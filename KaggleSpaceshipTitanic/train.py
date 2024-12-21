@@ -4,15 +4,17 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
+from tensorboardX import SummaryWriter
 
 from mlp import SimpleMLP
 
+run_name = 'mac_03'
 
 num_epochs = 100
-lr = 0.0001
+lr = 0.01
 batch_size = 64
 
-hidden_dim = 64
+hidden_dim = 2
 hidden_num = 2
 weight_decay = 1e-5
 
@@ -51,6 +53,7 @@ def main():
     
     # 训练模型
     print('\n================================== 训练模型 ==================================')
+    writer = SummaryWriter(f'runs/{run_name}')
     for epoch in range(num_epochs):
         model.train()
         
@@ -59,18 +62,24 @@ def main():
         
         # 预测正确的个数
         correct_num = 0
+        step = 0
         for X_batch, y_batch in train_loader:
             y_pred = model(X_batch)
             correct_num += torch.sum((y_pred > 0.5) == y_batch).item()
             
             l = loss(y_pred, y_batch)
+            writer.add_scalar(f'loss/epoch{epoch}', l.item(), step)
             epoch_loss += l.item()
 
             optimizer.zero_grad()
             l.backward()
             optimizer.step()
+
+            step += 1
         
         print(f'Epoch: {epoch}, Epoch Loss: {epoch_loss}, Accuracy: {correct_num / n_train}')
+        writer.add_scalar(f'accuracy', correct_num / n_train, epoch)
+        writer.add_scalar(f'loss', epoch_loss, epoch)
     
     # 预测测试集
     print('\n================================== 预测测试集 ==================================')

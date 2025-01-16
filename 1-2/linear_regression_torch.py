@@ -70,3 +70,7 @@ if __name__ == '__main__':
     # 训练完成，打印参数
     print(f'W_true: {W_true}, W: {model.linear.weight.detach().numpy().flatten()}')
     print(f'b_true: {b_true}, b: {model.linear.bias.item()}')
+    
+    # 绘制拟合结果
+    y_hat = model(torch.tensor(X, dtype=torch.float32)).detach().numpy()
+    utils.draw_3d_scatter(X, Y, y_hat)

@@ -55,3 +55,7 @@ if __name__ == '__main__':
     # 训练完成，打印参数
     print(f'W_true: {W_true}, W: {w.detach().numpy().flatten()}')
     print(f'b_true: {b_true}, b: {b.item()}')
+    
+    # 绘制拟合结果
+    y_hat = X @ w.detach().numpy() + b.item()
+    utils.draw_3d_scatter(X, Y, y_hat)

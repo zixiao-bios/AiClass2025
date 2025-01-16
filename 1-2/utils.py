@@ -24,11 +24,12 @@ def make_linear_data(W, b, num, noise=1):
     return X, y
 
 def draw_2d_scatter(X, y, y_hat=None):
-    """绘制二维散点图
+    """绘制二维散点图，支持同时绘制原始数据和预测数据
 
     Args:
         X (_type_): 特征数据，形状为 (num, 1)
         y (_type_): 标签数据，形状为 (num, 1)
+        y_hat (_type_): 预测数据，形状为 (num, 1)，不指定则不绘制
     """
     plt.scatter(X, y, s=5, label='Original Data')
     if y_hat is not None:
@@ -37,12 +38,13 @@ def draw_2d_scatter(X, y, y_hat=None):
     plt.ylabel('Y')
     plt.show()
 
-def draw_3d_scatter(X, y):
+def draw_3d_scatter(X, y, y_hat=None):
     """绘制三维散点图
 
     Args:
         X (_type_): 特征数据，形状为 (num, 2)
         y (_type_): 标签数据，形状为 (num, 1)
+        y_hat (_type_): 预测数据，形状为 (num, 1)，不指定则不绘制
     """
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
@@ -51,6 +53,10 @@ def draw_3d_scatter(X, y):
     # 添加颜色条
     cbar = plt.colorbar(scatter, pad=0.1)
     cbar.set_label('Y')
+
+    if y_hat is not None:
+        # 预测值使用小红点表示
+        ax.scatter(X[:,0], X[:,1], y_hat[:, 0], c='red', s=10, alpha=1)
     
     # 设置轴标签
     ax.set_xlabel('X1')

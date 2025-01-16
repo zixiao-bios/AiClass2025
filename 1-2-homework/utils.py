@@ -31,6 +31,14 @@ def draw_2d_scatter(X, y, y_hat=None):
         y (_type_): 标签数据，形状为 (num, 1)
         y_hat (_type_): 预测数据，形状为 (num, 1)，不指定则不绘制
     """
+    # 如果超过 1000 个点，随机选择 1000 个点绘制
+    if len(X) > 1000:
+        indices = np.random.choice(len(X), size=1000, replace=False)
+        X = X[indices]
+        y = y[indices]
+        if y_hat is not None:
+            y_hat = y_hat[indices]
+    
     plt.scatter(X, y, s=5, label='Original Data')
     if y_hat is not None:
         plt.plot(X, y_hat, color='red', label='Fitting Line')
@@ -46,6 +54,14 @@ def draw_3d_scatter(X, y, y_hat=None):
         y (_type_): 标签数据，形状为 (num, 1)
         y_hat (_type_): 预测数据，形状为 (num, 1)，不指定则不绘制
     """
+    # 如果超过 1000 个点，随机选择 1000 个点绘制
+    if len(X) > 1000:
+        indices = np.random.choice(len(X), size=1000, replace=False)
+        X = X[indices]
+        y = y[indices]
+        if y_hat is not None:
+            y_hat = y_hat[indices]
+    
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     scatter = ax.scatter(X[:,0], X[:,1], y[:, 0], c=y[:, 0], cmap='viridis', s=50, alpha=0.7)

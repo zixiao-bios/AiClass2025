@@ -39,6 +39,10 @@ print("广播加法:\n", tensor_broadcast)
 if torch.cuda.is_available():
     tensor_gpu = tensor1.to("cuda")
     print("在GPU上的tensor:", tensor_gpu)
+# mac
+if torch.mps.is_available():
+    tensor_gpu = tensor1.to("mps")
+    print("在MPS上的tensor:", tensor_gpu)
 
 
 # ================ 改变形状 ================
@@ -60,6 +64,7 @@ y = x * x  # 操作
 y_sum = y.sum()  # 求和
 y_sum.backward()  # 计算梯度，只能对标量调用backward()
 print("x的梯度:", x.grad)  # 输出 tensor([4., 6.])
+x = x - 0.1 * x.grad  # 梯度下降
 
 
 # ================ 与 ndarray 的转换 ================
@@ -72,3 +77,11 @@ print("从ndarray转换为tensor:", tensor_from_numpy)
 tensor = torch.tensor([4.0, 5.0, 6.0])
 numpy_from_tensor = tensor.numpy()
 print("从tensor转换为ndarray:", numpy_from_tensor)
+
+# 从GPU上的tensor转换为ndarray
+array = tensor_gpu.cpu().numpy()
+
+# 从有梯度的tensor转换为ndarray
+array = x.detach().numpy()
+
+array = x.detach().cpu().numpy()

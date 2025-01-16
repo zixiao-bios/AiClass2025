@@ -1,1 +1,0 @@
-[竞赛网址](https://www.kaggle.com/competitions/spaceship-titanic/overview)

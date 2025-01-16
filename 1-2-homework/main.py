@@ -3,7 +3,7 @@ import torch
 import utils
 
 
-# 在这里定义你的模型
+# 在这里定义你的模型，不要直接复制代码！
 
 
 
@@ -19,7 +19,7 @@ if __name__ == '__main__':
     utils.draw_2d_scatter(X, Y)
     # utils.draw_3d_scatter(X, Y)
     
-    # 在这里开始你的表演！
+    # 在这里开始你的表演，不要直接复制代码！
     
     
     

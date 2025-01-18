@@ -20,7 +20,7 @@ class SimpleMLP(nn.Module):
         # 第一层全连接后使用ReLU激活函数
         x = self.fc1(x)
         x = F.relu(x)
-
+        
         # 第二层全连接后直接输出
         return self.fc2(x)
 
@@ -41,14 +41,14 @@ if __name__ == '__main__':
     # 模型、损失函数、优化器
     model = SimpleMLP()
     criterion = nn.MSELoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.1)
+    optimizer = optim.Adam(model.parameters(), lr=0.01)
 
     # 创建数据集和加载器
     dataset = TensorDataset(X, Y)
     data_loader = DataLoader(dataset, batch_size=16, shuffle=True)
 
     # 训练模型
-    epochs = 50
+    epochs = 100
     for epoch in range(epochs):
         epoch_loss = 0
         

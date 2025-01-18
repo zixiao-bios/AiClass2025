@@ -18,9 +18,13 @@ class SimpleMLP(nn.Module):
         self.hidden_dim = hidden_dim
         self.output_dim = output_dim
 
-        # 创建隐藏层
+        # ModuleList 用于存储多个层（类似List）
         self.hidden_layers = nn.ModuleList()
+
+        # 第一层
         self.hidden_layers.append(nn.Linear(input_dim, hidden_dim))
+
+        # 中间隐藏层
         for _ in range(hidden_num - 1):
             self.hidden_layers.append(nn.Linear(hidden_dim, hidden_dim))
 
@@ -28,7 +32,7 @@ class SimpleMLP(nn.Module):
         self.output_layer = nn.Linear(hidden_dim, output_dim)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # 通过所有隐藏层
+        # 通过所有层，使用ReLU激活函数
         for layer in self.hidden_layers:
             x = F.relu(layer(x))
 

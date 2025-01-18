@@ -2,27 +2,31 @@ import pandas as pd
 
 
 def preprocess():
-    print("\n================================== 读入数据 ==================================")
+    print("\n================================== 读入数据")
     df_train = pd.read_csv('dataset/train.csv')
     df_test = pd.read_csv('dataset/test.csv')
     print(df_train.info())
     print(df_test.info())
     
     # 1. 合并数据集
-    print("\n================================== 合并数据 ==================================")
+    print("\n================================== 合并数据")
+    # 合并训练集和测试集
     df_feat = pd.concat([df_train, df_test], ignore_index=True)
+    # 删除无关列
     df_feat = df_feat.drop(['PassengerId', 'Name'], axis=1)
     print(df_feat.info())
     print(df_feat)
     
     # 2. 分离 Cabin 列
-    print("\n================================== 分离 Cabin 列 ==================================")
+    print("\n================================== 分离 Cabin 列")
+    # 把 Cabin 列分为 Deck、Num、Side 三列
     df_feat[['Deck','Num','Side']] = df_feat['Cabin'].str.split('/', expand=True)
+    # 删除 Cabin 列
     df_feat = df_feat.drop(['Cabin'], axis=1)
     print(df_feat.info())
 
     # 3. 处理数值型数据
-    print("\n================================== 处理数值型数据 ==================================")
+    print("\n================================== 处理数值型数据")
     # 提取类型为数值的列
     num_cols = df_feat.columns[df_feat.dtypes != 'object']
     # 归一化（均值为0，方差为1）
@@ -33,7 +37,8 @@ def preprocess():
     print(df_feat.describe())
     
     # 4. 处理类别型数据
-    print("\n================================== 处理类别型数据 ==================================")
+    print("\n================================== 处理类别型数据")
+    # 提取类型为类别的列
     cate_cols = df_feat.columns[df_feat.dtypes == 'object']
     # 用整数编码替换类别，NAN值用-1替换
     df_feat[cate_cols] = df_feat[cate_cols].apply(lambda x: pd.Categorical(x).codes)
@@ -41,7 +46,8 @@ def preprocess():
     print(df_feat)
     
     # 5. 分离训练集和测试集
-    print("\n================================== 分离训练集和测试集 ==================================")
+    print("\n================================== 分离训练集和测试集")
+    # 从总数据中，再分出训练集和测试集
     df_train_processed = df_feat.iloc[:len(df_train)]
     df_test_processed = df_feat.iloc[len(df_train):]
     # 重新设置id

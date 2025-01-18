@@ -8,20 +8,21 @@ from tensorboardX import SummaryWriter
 
 from mlp import SimpleMLP
 
-run_name = 'mac_03'
+# tensorboard 记录的文件夹名称
+run_name = '01'
 
-num_epochs = 100
+# 超参数
+num_epochs = 50
 lr = 0.01
 batch_size = 64
 
-hidden_dim = 2
+hidden_dim = 16
 hidden_num = 2
-weight_decay = 1e-5
 
 
 def main():
     # 读入处理后的数据
-    print('\n================================== 读入处理后的数据 ==================================')
+    print('\n======== 读入处理后的数据')
     df_train = pd.read_csv('dataset/train_processed.csv')
     df_test = pd.read_csv('dataset/test_processed.csv')
     
@@ -32,7 +33,7 @@ def main():
     print(df_train_target)
     
     # 将数据转换为 PyTorch 的 Tensor
-    print('\n================================== 将数据转换为 PyTorch 的 Tensor ==================================')
+    print('\n======== 将数据转换为 PyTorch 的 Tensor')
     n_train = df_train.shape[0]
     n_test = df_test.shape[0]
     
@@ -48,11 +49,11 @@ def main():
     
     # 定义模型、损失函数和优化器
     model = SimpleMLP(input_dim=X_train.shape[1], hidden_num=hidden_num, hidden_dim=hidden_dim, output_dim=1)
-    optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
+    optimizer = optim.Adam(model.parameters(), lr=lr)
     loss = nn.BCELoss()
     
     # 训练模型
-    print('\n================================== 训练模型 ==================================')
+    print('\n======== 训练模型')
     writer = SummaryWriter(f'runs/{run_name}')
     for epoch in range(num_epochs):
         model.train()
@@ -65,10 +66,11 @@ def main():
         step = 0
         for X_batch, y_batch in train_loader:
             y_pred = model(X_batch)
+            
+            # 计算预测正确的个数，阈值为0.5
             correct_num += torch.sum((y_pred > 0.5) == y_batch).item()
             
             l = loss(y_pred, y_batch)
-            writer.add_scalar(f'loss/epoch{epoch}', l.item(), step)
             epoch_loss += l.item()
 
             optimizer.zero_grad()
@@ -82,10 +84,15 @@ def main():
         writer.add_scalar(f'loss', epoch_loss, epoch)
     
     # 预测测试集
-    print('\n================================== 预测测试集 ==================================')
+    print('\n======== 预测测试集')
+    # 设置为评估模式
     model.eval()
     y_pred = model(X_test)
+    
+    # 计算预测结果，阈值为0.5，转换为 bool 类型
     y_pred = (y_pred > 0.5).reshape(-1).cpu().numpy().astype(bool)
+    
+    # 保存到 CSV 文件
     sub = pd.DataFrame({'PassengerId': df_test['PassengerId'], 'Transported': y_pred})
     print(sub)
     sub.to_csv('submission.csv', index=False)

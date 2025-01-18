@@ -16,8 +16,8 @@ num_epochs = 50
 lr = 0.01
 batch_size = 64
 
-hidden_dim = 16
-hidden_num = 2
+hidden_dim = 4
+hidden_num = 1
 
 
 def main():
@@ -43,60 +43,8 @@ def main():
     print(X_train.shape)
     print(y_train.shape)
     
-    # 构建 DataLoader
-    train_dataset = TensorDataset(X_train, y_train)
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    # 开始你的表演
     
-    # 定义模型、损失函数和优化器
-    model = SimpleMLP(input_dim=X_train.shape[1], hidden_num=hidden_num, hidden_dim=hidden_dim, output_dim=1)
-    optimizer = optim.Adam(model.parameters(), lr=lr)
-    loss = nn.BCELoss()
-    
-    # 训练模型
-    print('\n======== 训练模型')
-    writer = SummaryWriter(f'runs/{run_name}')
-    for epoch in range(num_epochs):
-        model.train()
-        
-        # 每个 epoch 的损失
-        epoch_loss = 0
-        
-        # 预测正确的个数
-        correct_num = 0
-        step = 0
-        for X_batch, y_batch in train_loader:
-            y_pred = model(X_batch)
-            
-            # 计算预测正确的个数，阈值为0.5
-            correct_num += torch.sum((y_pred > 0.5) == y_batch).item()
-            
-            l = loss(y_pred, y_batch)
-            epoch_loss += l.item()
-
-            optimizer.zero_grad()
-            l.backward()
-            optimizer.step()
-
-            step += 1
-        
-        print(f'Epoch: {epoch}, Epoch Loss: {epoch_loss}, Accuracy: {correct_num / n_train}')
-        writer.add_scalar(f'accuracy', correct_num / n_train, epoch)
-        writer.add_scalar(f'loss', epoch_loss, epoch)
-    
-    # 预测测试集
-    print('\n======== 预测测试集')
-    # 设置为评估模式
-    model.eval()
-    y_pred = model(X_test)
-    
-    # 计算预测结果，阈值为0.5，转换为 bool 类型
-    y_pred = (y_pred > 0.5).reshape(-1).cpu().numpy().astype(bool)
-    
-    # 保存到 CSV 文件
-    sub = pd.DataFrame({'PassengerId': df_test['PassengerId'], 'Transported': y_pred})
-    print(sub)
-    sub.to_csv('submission.csv', index=False)
-
 
 if __name__ == '__main__':
     main()

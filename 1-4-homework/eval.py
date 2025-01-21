@@ -27,14 +27,14 @@ def main():
     pass
     
     # 用 tensorboard 记录预测结果
-    # 假设 y_pred 中每一行是预测的标签（数字0～9）
+    # 假设 y_pred 中每一行是预测的标签（数字0～9）；data 是对应的图片，形状是 (n, c, h, w)
     for i in range(10):
         # mask 是一个布尔向量，表示 y_pred 的值等于 i 的位置，即预测为数字 i 的位置
         mask = (y_pred.view(-1) == i)
         # 仅当存在预测为数字 i 的图片时才记录
         if mask.sum() > 0:
             # 把预测为数字 i 的图片记录到 tensorboard
-            writer.add_images(f'num={i}', y_pred[mask])
+            writer.add_images(f'num={i}', data[mask])
 
 
 if __name__ == '__main__':

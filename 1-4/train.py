@@ -108,6 +108,12 @@ def main():
     
     # 不计算梯度
     with torch.no_grad():
+        # 在训练集上的指标
+        all_targets = y_train.argmax(dim=1).cpu()
+        all_preds = model(X_train.to(device)).argmax(dim=1).cpu()
+        accuracy, precision, recall, f1 = utils.metrics(all_targets, all_preds)
+        print(f"准确率={accuracy:.4f}, 精确率={precision:.4f}, 召回率={recall:.4f}, F1={f1:.4f}")
+        
         # 预测测试集
         y_pred = model(X_test.to(device))
         

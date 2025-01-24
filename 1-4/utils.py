@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 
 def make_linear_data(W, b, num, noise=1):
@@ -173,3 +174,11 @@ def save_to_csv(X, Y, filename):
     # 保存到 CSV 文件
     df.to_csv(filename, index=False)
     print(f"数据已保存到 '{filename}' 文件中")
+
+# 计算准确率、精确率、召回率、F1分数
+def metrics(all_targets, all_preds):
+    accuracy = accuracy_score(all_targets, all_preds)
+    precision = precision_score(all_targets, all_preds, average='macro')
+    recall = recall_score(all_targets, all_preds, average='macro')
+    f1 = f1_score(all_targets, all_preds, average='macro')
+    return accuracy, precision, recall, f1

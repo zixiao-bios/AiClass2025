@@ -9,4 +9,4 @@ drop_prob = 0.1
 # 训练参数
 batch_size = 20
 lr = 0.001
-epochs = 1000
+epochs = 200

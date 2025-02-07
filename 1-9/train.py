@@ -1,8 +1,7 @@
 import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader, TensorDataset
-from torch.optim.lr_scheduler import StepLR
-
+import json
 
 from config import *
 from text_process import *
@@ -23,63 +22,33 @@ dataset_raw = [
     ['This restaurant has the best food in town. You should definitely try it.', '这家餐厅的食物是全城最棒的，你一定要试试。']
 ]
 
-def data_process():
-    # 1. 分词，将句子转为 token 列表
-    dataset_tokenized = [
-        [tokenize(text[0], 'en'), tokenize(text[1], 'zh')]
-        for text in dataset_raw
-    ]
-    print(dataset_tokenized[0])
+def dataset_process(vocab, dataset):
+    """处理数据集，将文本转为 tensor
+    """
+    data_input = []
+    data_target = []
     
-
-    # 2. 构建词表
-    # 特殊 token
-    bos = '<bos>'
-    eos = '<eos>'
-    pad = '<pad>'
-    unk = '<unk>'
-    special_tokens = [bos, eos, pad, unk]
-
-    # token -> id
-    vocab = {token: i for i, token in enumerate(special_tokens)}
-    for text_en, text_zh in dataset_tokenized:
-        for token in text_en + text_zh:
-            if token not in vocab:
-                vocab[token] = len(vocab)
-    print(vocab)
-
-    # id -> token
-    id2token = {i: token for token, i in vocab.items()}
-
-
-    # 3. 添加特殊 token，并填充
-    dataset_processed = []
-    for text_en, text_zh in dataset_tokenized:
-        text_en = add_special_token(text_en, bos, eos, pad, max_len)
-        text_zh = add_special_token(text_zh, bos, eos, pad, max_len)
-        dataset_processed.append([text_en, text_zh])
-    print(dataset_processed[5])
+    for text_en, text_zh in dataset:
+        input_tensor = process_text(text_en, vocab, max_len, 'en')
+        target_tensor = process_text(text_zh, vocab, max_len, 'zh')
+        
+        data_input.append(input_tensor)
+        data_target.append(target_tensor)
     
+    # 将 tensor 列表转为一个大 tensor
+    data_input = torch.stack(data_input)
+    data_target = torch.stack(data_target)
     
-    # 4. 将 token 转为 id
-    dataset_train = []
-    for text_en, text_zh in dataset_processed:
-        text_en = [vocab.get(token, vocab[unk]) for token in text_en]
-        text_zh = [vocab.get(token, vocab[unk]) for token in text_zh]
-        dataset_train.append([text_en, text_zh])
-    print(dataset_train[5])
-    
-    
-    # 5. 将源语言和目标语言的 id 列表转为 2 个 tensor
-    dataset_train = torch.tensor(dataset_train, dtype=torch.long)
-    # 将两个句子拆开，变成两个 tensor
-    data_input = dataset_train[:, 0]
-    data_target = dataset_train[:, 1]
-    return data_input, data_target, vocab, id2token
+    return data_input, data_target
 
 
 def main():
-    data_input, data_target, vocab, id2token = data_process()
+    make_vocab(dataset_raw)
+    vocab = json.load(open('vocab.json', 'r'))
+    id2token = {i: token for token, i in vocab.items()}
+    
+    data_input, data_target = dataset_process(vocab, dataset_raw)
+    # data_input, data_target, vocab, id2token = data_process()
     print(data_input.shape, data_target.shape, len(vocab))
     
     dataset_train = TensorDataset(data_input, data_target)
@@ -115,15 +84,12 @@ def main():
     criterion = nn.CrossEntropyLoss(ignore_index=vocab['<pad>'])  # 忽略填充部分的损失
     optimizer = optim.Adam(model.parameters(), lr=lr)
     
-    # 创建学习率调度器，每 100 个 epoch 把学习率衰减 0.1 倍
-    scheduler = StepLR(optimizer, step_size=100, gamma=0.1)
-    
     for epoch in range(epochs):
         epoch_loss = 0
         for input, target in dataloader_train:
             input, target = input.to(device), target.to(device)
             
-            # 模型输出
+            # 把目标序列的最后一个 token 去掉，作为解码器输入（teacher forcing）
             output = model(input, target[:, :-1])
             # output: [batch_size, trg_len - 1, dec_voc_size]
             
@@ -136,12 +102,14 @@ def main():
             loss.backward()
             optimizer.step()
             
-        scheduler.step()
         print(f'Epoch {epoch}, Loss: {epoch_loss / len(dataloader_train)}')
         
         # 打印目标句子和模型输出的句子
         print('\t目标序列：', idx_to_text(target[0].tolist(), id2token, 'zh'))
         print('\t预测序列：', idx_to_text(output.argmax(dim=-1)[0].tolist(), id2token, 'zh'))
+    
+    # 保存模型
+    torch.save(model.state_dict(), 'transformer.pth')
 
 
 if __name__ == '__main__':

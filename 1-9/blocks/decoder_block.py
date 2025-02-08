@@ -1,7 +1,7 @@
 from torch import nn
 
 from layers.multi_head_attention import MultiHeadAttention
-from layers.position_wise_feed_forward import PositionwiseFeedForward
+from layers.ffn import FFN
 
 
 class DecoderBlock(nn.Module):
@@ -32,7 +32,7 @@ class DecoderBlock(nn.Module):
         self.dropout2 = nn.Dropout(p=drop_prob)  # 第二层 Dropout
         
         # 5. 位置前馈神经网络（Positionwise Feed-Forward Network）
-        self.ffn = PositionwiseFeedForward(d_model=d_model, hidden=ffn_hidden, drop_prob=drop_prob)
+        self.ffn = FFN(d_model=d_model, hidden=ffn_hidden, drop_prob=drop_prob)
         
         # 6. 第三层归一化和 dropout（前馈网络层）
         self.norm3 = nn.LayerNorm(d_model)  # 第三层 Layer Normalization

@@ -1,7 +1,7 @@
 from torch import nn
 
 from layers.multi_head_attention import MultiHeadAttention
-from layers.position_wise_feed_forward import PositionwiseFeedForward
+from layers.ffn import FFN
 
 
 class EncoderBlock(nn.Module):
@@ -24,7 +24,7 @@ class EncoderBlock(nn.Module):
         self.dropout1 = nn.Dropout(p=drop_prob)
         
         # 3. 位置前馈神经网络 Positionwise Feed-Forward Network（就是个MLP）
-        self.ffn = PositionwiseFeedForward(d_model=d_model, hidden=ffn_hidden, drop_prob=drop_prob)
+        self.ffn = FFN(d_model=d_model, hidden=ffn_hidden, drop_prob=drop_prob)
         
         # 4. 第二个 LayerNorm 和 dropout
         self.norm2 = nn.LayerNorm(d_model)

@@ -39,7 +39,7 @@ class TransformerEmbedding(nn.Module):
 
         # 计算位置编码
         pos_emb = self.pos_emb(x)
-        # pos_emb.shape: [batch_size, seq_len, d_model]
+        # pos_emb.shape: [seq_len, d_model]
 
         # 返回加了位置编码和 Dropout 的词嵌入
         return self.drop_out(tok_emb + pos_emb)

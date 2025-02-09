@@ -54,14 +54,13 @@ class DecoderBlock(nn.Module):
         x = self.dropout1(x)
         x = self.norm1(x + x_origin)
         
-        if enc is not None:
-            x_origin = x
-            # 3. 计算编码器-解码器的交叉注意力（Cross-Attention）
-            x = self.enc_dec_attention(x_q=x, x_k=enc, x_v=enc)
-            
-            # 4. 残差连接和层归一化（编码器-解码器注意力层）
-            x = self.dropout2(x)
-            x = self.norm2(x + x_origin)
+        x_origin = x
+        # 3. 计算编码器-解码器的交叉注意力（Cross-Attention）
+        x = self.enc_dec_attention(x_q=x, x_k=enc, x_v=enc)
+        
+        # 4. 残差连接和层归一化（编码器-解码器注意力层）
+        x = self.dropout2(x)
+        x = self.norm2(x + x_origin)
 
         # 5. 位置前馈神经网络
         x_origin = x

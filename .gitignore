@@ -4,3 +4,5 @@ __pycache__
 *.DS_Store
 1-5-homework/cifar-10
 */vocab.json
+*/build
+*/devel

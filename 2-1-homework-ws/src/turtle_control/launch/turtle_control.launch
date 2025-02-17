@@ -1,0 +1,17 @@
+<launch>
+    <param name='turtle_name' type='string' value='qiuqiu' />
+
+    <!-- 启动仿真器 -->
+    <node pkg="turtlesim" type="turtlesim_node" name='sim' />
+
+    <!-- 生成海龟 -->
+    <node pkg='turtle_control' type='spawn.py' name="spawn" />
+
+    <!-- 控制海龟 -->
+    <node pkg='turtle_control' type='control.py' name="control_1" >
+        <param name="turtle_name" value="turtle1" />
+    </node>
+    <node pkg='turtle_control' type='control.py' name="control_2" >
+        <param name="turtle_name" value="qiuqiu" />
+    </node>
+</launch>

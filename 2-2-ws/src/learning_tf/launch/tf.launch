@@ -1,0 +1,24 @@
+<launch>
+    <param name='turtle_name' type='string' value='qiuqiu' />
+
+    <!-- 启动仿真器 -->
+    <node pkg="turtlesim" type="turtlesim_node" name='sim' />
+
+    <!-- 生成海龟 -->
+    <node pkg='learning_tf' type='spawn.py' name="spawn" />
+
+    <!-- 发布 tf 变换 -->
+    <node pkg='learning_tf' type='tf_pub.py' name='turle1'>
+        <param name="turtle_name" value='turtle1'/>
+    </node>
+    <node pkg='learning_tf' type='tf_pub.py' name='turle2'>
+        <param name="turtle_name" value='qiuqiu'/>
+    </node>
+
+    <!-- 跟随 -->
+    <node pkg='learning_tf' type='follow.py' name='follow'>
+        <param name="turtle_name" value='qiuqiu'/>
+    </node>
+
+    <node pkg='rqt_graph' type='rqt_graph' name='graph'/>
+</launch>

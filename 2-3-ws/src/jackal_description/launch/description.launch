@@ -1,0 +1,15 @@
+<launch>
+  <arg name="use_gazebo" default="true" />
+
+  <param name="use_sim_time" value="$(arg use_gazebo)" />
+
+  <!-- robot config -->
+  <param name="robot_description" command="$(find xacro)/xacro $(find jackal_description)/urdf/jackal.urdf.xacro" />
+  
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+  <!-- 是否模拟发布关节状态，仅在不使用 gazebo 时模拟关节状态，使用 gazebo 时由 gazebo 计算关节状态 -->
+  <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" unless="$(arg use_gazebo)"/>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find jackal_description)/config/urdf.rviz" required="true"/>
+</launch>

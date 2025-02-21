@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="laser">
+    <xacro:macro name="rplidar" params="prefix:=laser">
+        <!-- Create laser reference frame -->
+        <link name="${prefix}_link">
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <visual>
+                <origin xyz=" 0 0 0 " rpy="0 0 0" />
+                <geometry>
+                    <mesh filename="package://jackal_description/meshes/lidar/lidar.dae" />
+                </geometry>
+            </visual>
+            <collision>
+                <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+                <geometry>
+                    <cylinder length="0.07" radius="0.05"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <gazebo reference="${prefix}_link">
+            <sensor type="ray" name="rplidar">
+                <pose>0 0 0 0 0 0</pose>
+                <visualize>false</visualize>
+                <update_rate>5.5</update_rate>
+                <ray>
+                    <scan>
+                      <horizontal>
+                        <!-- 总共有多少激光点 -->
+                        <samples>720</samples>
+                        <!-- 扫描范围（弧度），这里为360度 -->
+                        <min_angle>-${PI}</min_angle>
+                        <max_angle>${PI}</max_angle>
+                      </horizontal>
+                    </scan>
+                    <range>
+                      <!-- 最近&最远距离，该范围外的物体不可见 -->
+                      <min>0.10</min>
+                      <max>10.0</max>
+                      <!-- 距离分辨率（精度），这里为1cm -->
+                      <resolution>0.01</resolution>
+                    </range>
+                    <noise>
+                      <!-- 高斯噪声 -->
+                      <type>gaussian</type>
+                      <!-- 均值 -->
+                      <mean>0.0</mean>
+                      <!-- 标准差 -->
+                      <stddev>0.01</stddev>
+                    </noise>
+                </ray>
+                <plugin name="gazebo_rplidar" filename="libgazebo_ros_laser.so">
+                    <topicName>/scan</topicName>
+                    <frameName>laser_link</frameName>
+                </plugin>
+            </sensor>
+        </gazebo>
+    </xacro:macro>
+</robot>

@@ -1,0 +1,37 @@
+# 发布关节信息
+joint_publisher:
+  type: "joint_state_controller/JointStateController"
+  publish_rate: 50
+
+# 速度控制器，负责接收速度控制指令，并驱动车轮转动
+velocity_controller:
+  type: "diff_drive_controller/DiffDriveController"
+
+  # 左右轮link的名称，控制器自动通过轮间距和半径进行航迹推演
+  left_wheel: ['front_left_wheel', 'rear_left_wheel']
+  right_wheel: ['front_right_wheel', 'rear_right_wheel']
+  publish_rate: 50
+
+  # 协方差矩阵，用于不确定性的仿真，模拟现实中的误差
+  pose_covariance_diagonal: [0.001, 0.001, 1000000.0, 1000000.0, 1000000.0, 0.03]
+  twist_covariance_diagonal: [0.001, 0.001, 0.001, 1000000.0, 1000000.0, 0.03]
+
+  # 命令超时时间，如果在这个时间内没有收到速度指令，将停止机器人
+  cmd_vel_timeout: 0.25
+
+  # 是否发布里程计TF树节点
+  enable_odom_tf: true
+
+  # 速度和加速度限制
+  linear:
+    x:
+      has_velocity_limits    : true
+      max_velocity           : 2.0   # m/s
+      has_acceleration_limits: true
+      max_acceleration       : 0.5   # m/s^2
+  angular:
+    z:
+      has_velocity_limits    : true
+      max_velocity           : 4.0   # rad/s
+      has_acceleration_limits: true
+      max_acceleration       : 1.0   # rad/s^2

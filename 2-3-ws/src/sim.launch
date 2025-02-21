@@ -1,0 +1,6 @@
+<launch>
+  <include file="$(find robot_sim)/launch/sim.launch" />
+
+  <!-- 键盘控制节点 -->
+  <include file="$(find robot_sim)/launch/teleop_key.launch" />
+</launch>

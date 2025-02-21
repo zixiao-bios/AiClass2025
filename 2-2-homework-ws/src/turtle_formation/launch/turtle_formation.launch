@@ -34,5 +34,5 @@
     <param name="distance" value="1" /> 
   </node>
 
-  <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find turtle_formation)/config/turlt.rviz" required="true"/> -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find turtle_formation)/config/turlt.rviz" required="true"/>
 </launch>

@@ -1,0 +1,16 @@
+<launch>
+  <include file="$(find jackal_description)/launch/description.launch" />
+
+  <!-- Gmapping 建图 -->
+  <!-- <include file="$(find mapping)/launch/gmapping.launch" /> -->
+
+  <!-- 建图和定位只能开启其中一个，否则会同时发布定位信息，导致冲突 -->
+  <!-- AMCL 定位 -->
+  <include file="$(find mapping)/launch/amcl.launch" />
+
+  <!-- move_base 导航 -->
+  <include file="$(find robot_nav)/launch/move_base.launch" />
+
+  <!-- rviz -->
+  <node pkg="rqt_image_view" type="rqt_image_view" name="rqt_image_view" />
+</launch>

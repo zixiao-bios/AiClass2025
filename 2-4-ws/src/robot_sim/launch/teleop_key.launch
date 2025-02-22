@@ -1,0 +1,5 @@
+<launch>
+  <node name="teleop_twist_key" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen">
+    <remap from="cmd_vel" to="velocity_controller/cmd_vel" />
+  </node>
+</launch>

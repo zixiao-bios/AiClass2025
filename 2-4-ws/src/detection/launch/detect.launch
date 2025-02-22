@@ -1,0 +1,8 @@
+<launch>
+  <node name="detect" pkg="detection" type="detection.py">
+    <param name="yolo_weight_path" value="/home/qrobo/yolo/weights/yolov8l.pt" />
+    <param name="fov" value="60" />
+    <param name="img_w" value="640" />
+    <param name="img_h" value="480" />
+  </node>
+</launch>

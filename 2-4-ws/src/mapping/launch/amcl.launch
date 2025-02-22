@@ -1,0 +1,14 @@
+<launch>
+  <arg name="map_file" default="$(find mapping)/map/home.yaml"/>
+
+  <!-- Run the map server -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+
+  <node pkg="amcl" type="amcl" name="amcl" clear_params="true">
+    <remap from="scan" to="scan" />
+
+    <param name="use_map_topic" value="true" />
+    <param name="gui_publish_rate" value="10" />
+    <param name="transform_tolerance" value="0.2" />
+  </node>
+</launch>

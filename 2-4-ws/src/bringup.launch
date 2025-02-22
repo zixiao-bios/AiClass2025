@@ -1,0 +1,18 @@
+<launch>
+  <include file="$(find jackal_description)/launch/description.launch" />
+
+  <!-- 目标检测与定位 -->
+  <include file="$(find detection)/launch/detect.launch" />
+
+  <!-- Gmapping 建图 -->
+  <!-- <include file="$(find mapping)/launch/gmapping.launch" /> -->
+
+  <!-- AMCL 定位 -->
+  <include file="$(find mapping)/launch/amcl.launch" />
+
+  <!-- move_base 导航 -->
+  <include file="$(find robot_nav)/launch/move_base.launch" />
+
+  <!-- viz -->
+  <node pkg="rqt_image_view" type="rqt_image_view" name="rqt_image_view" />
+</launch>

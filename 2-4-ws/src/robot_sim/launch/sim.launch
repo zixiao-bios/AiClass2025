@@ -1,0 +1,59 @@
+<launch>
+  <arg name="use_fusion_odom" value="true" />
+
+  <!-- gazebo 参数 -->
+  <!-- <arg name="gazebo_world" default="office_small.world" /> -->
+  <arg name="gazebo_world" default="$(find robot_sim)/worlds/home.world" />
+  <!-- <arg name="gazebo_world" default="$(find robot_sim)/worlds/runway.world" /> -->
+
+  <!-- 机器人生成位置 -->
+  <arg name="spawn_xyz" default="-x 0 -y 0 -z 0"/>
+  <!-- <arg name="spawn_xyz" value="-x -6 -y -2 -z 1"/> -->
+
+  <!-- 机器人模型 -->
+  <param name="robot_description" command="$(find xacro)/xacro $(find jackal_description)/urdf/jackal.urdf.xacro" />
+  
+  <!-- 启动 gazebo -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+      <arg name="world_name" value="$(arg gazebo_world)"/>
+      <arg name="use_sim_time" value="true"/>
+  </include>
+
+  <!-- 在 gazebo 中加载机器人 -->
+  <node name="spawn_model" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+        args="-urdf -param robot_description $(arg spawn_xyz) -model jackal" />
+
+  <!-- 如果不使用融合里程计，执行这个group -->
+  <group unless="$(arg use_fusion_odom)" >
+    <!-- 加载控制器参数，控制器发布odom的tf变换 -->
+    <rosparam command="load" file="$(find robot_sim)/config/control.yaml" />
+  </group>
+
+  <!-- 如果使用融合里程计，执行这个group -->
+  <group if="$(arg use_fusion_odom)" >
+    <!-- 加载控制器参数，控制器不发布odom的tf变换 -->
+    <rosparam command="load" file="$(find robot_sim)/config/control_no_tf.yaml" />
+    
+    <!-- 启动融合odom节点，发布odom的tf变换 -->
+    <node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
+      <!-- 融合里程计的tf frame名称(tf树的父节点) -->
+      <param name="output_frame" value="odom"/>
+
+      <!-- 机器人base_link名称(tf树的子节点) -->
+      <param name="base_footprint_frame" value="base_link"/>
+
+      <param name="freq" value="30.0"/>
+
+      <!-- 是否使用轮速计、imu、视觉里程计 -->
+      <param name="odom_used" value="true"/>
+      <param name="imu_used" value="true"/>
+      <param name="vo_used" value="false"/>
+      
+      <!-- 设置轮速计和imu的topic名称 -->
+      <remap from="odom" to="velocity_controller/odom" />
+      <remap from="imu_data" to="imu_data" />
+    </node>
+  </group>
+
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" args="joint_publisher velocity_controller" />
+</launch>
